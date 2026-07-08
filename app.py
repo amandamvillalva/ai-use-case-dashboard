@@ -118,12 +118,12 @@ st.markdown(f"""
     border-color: rgba(255,255,255,0.3) !important;
   }}
   [data-testid="stSidebar"] input[type="text"] {{
-    background-color: rgba(255,255,255,0.12) !important;
-    color: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0a0a2e !important;
     border-color: rgba(255,255,255,0.3) !important;
   }}
   [data-testid="stSidebar"] input[type="text"]::placeholder {{
-    color: rgba(255,255,255,0.5) !important;
+    color: #888888 !important;
   }}
   [data-baseweb="popover"] ul li,
   [data-baseweb="popover"] ul li span,
