@@ -356,7 +356,8 @@ def uc_card(row, border_color=None):
     badge_color = STATUS_COLORS.get(status, "#AAAAAA")
     top_color   = border_color or badge_color
     name        = clean(row.get("Use Case Name"), "Unnamed")
-    description = clean(row.get("Description") or row.get("What do you want to build?"))
+    what_to_build = clean(row.get("What do you want to build?"))
+    agent_desc    = clean(row.get("Describe what the AI agent would do."))
     savings     = clean(row.get("Time Savings"))
     rec         = clean(row.get("Recommendation"))
     go_live     = clean(row.get("Target Go-Live Date"))
@@ -365,6 +366,16 @@ def uc_card(row, border_color=None):
     score_line  = (f"<br><span style='font-size:0.78rem;'><b>Score:</b> {score} &nbsp;|&nbsp; "
                    f"<b>Band:</b> {band}</span>") if pd.notna(band) and pd.notna(score) else ""
     go_live_line = f"<br><b>Target Go-Live:</b> {go_live}" if go_live != "Not provided" else ""
+
+    what_section = (f"<div style='margin-bottom:6px;'><span style='font-size:0.72rem; font-weight:700; "
+                    f"color:{BLUE}; text-transform:uppercase; letter-spacing:0.5px;'>What to Build</span>"
+                    f"<div style='font-size:0.82rem; color:#444; line-height:1.5; margin-top:2px;'>{what_to_build}</div></div>"
+                    ) if what_to_build != "Not provided" else ""
+    agent_section = (f"<div><span style='font-size:0.72rem; font-weight:700; "
+                     f"color:{BLUE}; text-transform:uppercase; letter-spacing:0.5px;'>What the Agent Does</span>"
+                     f"<div style='font-size:0.82rem; color:#444; line-height:1.5; margin-top:2px;'>{agent_desc}</div></div>"
+                     ) if agent_desc != "Not provided" else ""
+
     return f"""
 <div style="background:#ffffff; border-radius:12px; padding:18px 16px; margin-bottom:16px;
             box-shadow:0 2px 10px rgba(0,0,0,0.08); border-top:4px solid {top_color};
@@ -374,7 +385,7 @@ def uc_card(row, border_color=None):
     <span style="background:{badge_color}; color:#fff; border-radius:20px;
                  padding:3px 10px; font-size:0.72rem; font-weight:700;">{status}</span>
   </div>
-  <div style="color:#444; font-size:0.82rem; line-height:1.5; flex:1;">{description}</div>
+  <div style="flex:1;">{what_section}{agent_section}</div>
   <div style="border-top:1px solid #eee; padding-top:8px; font-size:0.78rem; color:{NAVY};">
     <b>Time Savings:</b> {savings}<br>
     <b>Recommendation:</b> {rec}{go_live_line}{score_line}
