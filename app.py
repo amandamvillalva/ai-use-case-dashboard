@@ -219,6 +219,16 @@ def load_data_from_upload(uploaded_file) -> pd.DataFrame:
     df["Status"] = df["Status"].fillna("Unknown").str.strip()
     return df
 
+SUMMARIES_FILE = Path(__file__).parent / "data" / "summaries.json"
+
+def load_summaries() -> dict:
+    if SUMMARIES_FILE.exists():
+        import json
+        return json.loads(SUMMARIES_FILE.read_text())
+    return {}
+
+SUMMARIES = load_summaries()
+
 latest_file = find_latest_file()
 
 if latest_file is None:
@@ -372,8 +382,7 @@ def uc_card(row, border_color=None):
     badge_color = STATUS_COLORS.get(status, "#AAAAAA")
     top_color   = border_color or badge_color
     name        = clean(row.get("Use Case Name"), "Unnamed")
-    what_to_build = summarize(clean(row.get("What do you want to build?")))
-    agent_desc    = summarize(clean(row.get("Describe what the AI agent would do.")))
+    summary     = SUMMARIES.get(name, "")
     savings     = clean(row.get("Time Savings"))
     rec         = clean(row.get("Recommendation"))
     go_live     = clean(row.get("Target Go-Live Date"))
@@ -383,14 +392,9 @@ def uc_card(row, border_color=None):
                    f"<b>Band:</b> {band}</span>") if pd.notna(band) and pd.notna(score) else ""
     go_live_line = f"<br><b>Target Go-Live:</b> {go_live}" if go_live != "Not provided" else ""
 
-    what_section = (f"<div style='margin-bottom:6px;'><span style='font-size:0.72rem; font-weight:700; "
-                    f"color:{BLUE}; text-transform:uppercase; letter-spacing:0.5px;'>What to Build</span>"
-                    f"<div style='font-size:0.82rem; color:#444; line-height:1.5; margin-top:2px;'>{what_to_build}</div></div>"
-                    ) if what_to_build != "Not provided" else ""
-    agent_section = (f"<div><span style='font-size:0.72rem; font-weight:700; "
-                     f"color:{BLUE}; text-transform:uppercase; letter-spacing:0.5px;'>What the Agent Does</span>"
-                     f"<div style='font-size:0.82rem; color:#444; line-height:1.5; margin-top:2px;'>{agent_desc}</div></div>"
-                     ) if agent_desc != "Not provided" else ""
+    summary_section = (f"<div style='font-size:0.82rem; color:#444; line-height:1.6;'>{summary}</div>"
+                       ) if summary else ""
+    what_section = agent_section = ""
 
     return f"""
 <div style="background:#ffffff; border-radius:12px; padding:18px 16px; margin-bottom:16px;
@@ -401,7 +405,7 @@ def uc_card(row, border_color=None):
     <span style="background:{badge_color}; color:#fff; border-radius:20px;
                  padding:3px 10px; font-size:0.72rem; font-weight:700;">{status}</span>
   </div>
-  <div style="flex:1;">{what_section}{agent_section}</div>
+  <div style="flex:1;">{summary_section}</div>
   <div style="border-top:1px solid #eee; padding-top:8px; font-size:0.78rem; color:{NAVY};">
     <b>Time Savings:</b> {savings}<br>
     <b>Recommendation:</b> {rec}{go_live_line}{score_line}

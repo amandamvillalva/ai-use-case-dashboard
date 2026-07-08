@@ -1,5 +1,6 @@
 # Data files — contain Moody's confidential information, managed separately from code
 data/
+!data/summaries.json
 
 # Secrets — NEVER commit these. The connection strings and API keys your app uses live here.
 .env
