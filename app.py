@@ -175,12 +175,12 @@ st.markdown(f"""
 # ── Load data ─────────────────────────────────────────────────────────────────
 DATA_DIR = Path(__file__).parent / "data"
 
-def load_latest_file():
+def find_latest_file():
+    """Return the most recently modified .xlsx in data/, or None if folder missing/empty."""
+    if not DATA_DIR.exists():
+        return None
     files = sorted(DATA_DIR.glob("*.xlsx"), key=lambda f: f.stat().st_mtime, reverse=True)
-    if not files:
-        st.error("No Excel file found in the data/ folder.")
-        st.stop()
-    return files[0]
+    return files[0] if files else None
 
 @st.cache_data(ttl=300)
 def load_data(filepath: str) -> pd.DataFrame:
@@ -193,11 +193,44 @@ def load_data(filepath: str) -> pd.DataFrame:
     df["Status"] = df["Status"].fillna("Unknown").str.strip()
     return df
 
-latest_file = load_latest_file()
-df = load_data(str(latest_file))
-df = df[~df["Status"].isin(["Deleted", "Declined"])].reset_index(drop=True)
+def load_data_from_upload(uploaded_file) -> pd.DataFrame:
+    df = pd.read_excel(uploaded_file)
+    df.columns = df.columns.str.strip()
+    for col in ["Total Score", "Band"]:
+        if col in df.columns:
+            df[col] = df[col].replace("#INVALID VALUE", pd.NA)
+    df["Department/Team"] = df["Department/Team"].fillna("Unknown").str.strip()
+    df["Status"] = df["Status"].fillna("Unknown").str.strip()
+    return df
 
-file_modified = datetime.fromtimestamp(latest_file.stat().st_mtime).strftime("%B %d, %Y at %I:%M %p")
+latest_file = find_latest_file()
+
+if latest_file is None:
+    # No data file found — show uploader so the app works on Streamlit Cloud
+    st.markdown(f"""
+    <div style="max-width:600px; margin:60px auto; background:#ffffff; border-radius:16px;
+                padding:36px 40px; box-shadow:0 4px 20px rgba(0,0,0,0.10);
+                border-top:5px solid {BLUE}; text-align:center;">
+      <div style="font-size:2.2rem; margin-bottom:12px;">📂</div>
+      <div style="font-size:1.3rem; font-weight:800; color:{NAVY}; margin-bottom:10px;">Upload Your Data File</div>
+      <div style="font-size:0.9rem; color:#555; line-height:1.7; margin-bottom:24px;">
+        No data file was found. Please upload the latest AI Use Cases Excel export
+        from Smartsheet to load the dashboard.
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+    uploaded = st.file_uploader("Upload the AI Use Cases .xlsx file", type=["xlsx"])
+    if uploaded is None:
+        st.stop()
+    df = load_data_from_upload(uploaded)
+    file_modified = "Uploaded just now"
+    file_name_display = uploaded.name
+else:
+    df = load_data(str(latest_file))
+    file_modified = datetime.fromtimestamp(latest_file.stat().st_mtime).strftime("%B %d, %Y at %I:%M %p")
+    file_name_display = latest_file.name
+
+df = df[~df["Status"].isin(["Deleted", "Declined"])].reset_index(drop=True)
 
 # ── Header ────────────────────────────────────────────────────────────────────
 logo_path = Path(__file__).parent / "assets" / "mdy_logo_rgb_MoodysBlue.jpg"
@@ -209,7 +242,7 @@ st.markdown(f"""
     <span style="font-size:2rem; font-weight:800; color:{NAVY};">AI Use Case Review Dashboard</span><br>
     <span style="font-size:0.85rem; color:#555;">Moody's People Team</span><br>
     <span style="font-size:0.78rem; color:#888; margin-top:4px; display:inline-block;">
-      📁 {latest_file.name} &nbsp;·&nbsp; 🕒 Last updated: {file_modified}
+      📁 {file_name_display} &nbsp;·&nbsp; 🕒 Last updated: {file_modified}
     </span>
 </div>
 """, unsafe_allow_html=True)
