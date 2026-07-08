@@ -1,0 +1,28 @@
+# Data files — contain Moody's confidential information, managed separately from code
+data/
+
+# Secrets — NEVER commit these. The connection strings and API keys your app uses live here.
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Node / React
+node_modules/
+.next/
+dist/
+build/
+npm-debug.log*
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

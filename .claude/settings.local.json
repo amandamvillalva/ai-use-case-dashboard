@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip3 install *)",
+      "Bash(python3 -c ' *)",
+      "Bash(extract-text \"/Users/villalva/Downloads/Presentation1.pptx\")",
+      "Bash(python3 -c \"import app\")",
+      "Bash(python3 -)"
+    ]
+  }
+}
