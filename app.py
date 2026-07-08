@@ -38,6 +38,22 @@ CHART_LAYOUT = dict(
     margin=dict(t=50, b=20, l=10, r=80),
 )
 
+# ── Helper: truncate to a short summary ──────────────────────────────────────
+def summarize(text, max_chars=150):
+    """Return first sentence if short; otherwise trim to max_chars at a word boundary."""
+    if not text or text == "Not provided":
+        return text
+    # Try first sentence
+    for sep in (". ", ".\n", "! ", "? "):
+        idx = text.find(sep)
+        if 0 < idx <= max_chars:
+            return text[:idx + 1]
+    # Fall back to word boundary trim
+    if len(text) <= max_chars:
+        return text
+    trimmed = text[:max_chars].rsplit(" ", 1)[0]
+    return trimmed + "…"
+
 # ── Helper: clean nan values ──────────────────────────────────────────────────
 def clean(val, fallback="Not provided"):
     if val is None:
@@ -356,8 +372,8 @@ def uc_card(row, border_color=None):
     badge_color = STATUS_COLORS.get(status, "#AAAAAA")
     top_color   = border_color or badge_color
     name        = clean(row.get("Use Case Name"), "Unnamed")
-    what_to_build = clean(row.get("What do you want to build?"))
-    agent_desc    = clean(row.get("Describe what the AI agent would do."))
+    what_to_build = summarize(clean(row.get("What do you want to build?")))
+    agent_desc    = summarize(clean(row.get("Describe what the AI agent would do.")))
     savings     = clean(row.get("Time Savings"))
     rec         = clean(row.get("Recommendation"))
     go_live     = clean(row.get("Target Go-Live Date"))
