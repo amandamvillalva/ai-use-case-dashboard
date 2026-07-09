@@ -387,6 +387,7 @@ def uc_card(row, border_color=None):
     top_color   = border_color or badge_color
     name        = clean(row.get("Use Case Name"), "Unnamed")
     summary     = SUMMARIES.get(name, "")
+    maker       = clean(row.get("Requestor Name"))
     savings     = clean(row.get("Time Savings"))
     rec         = clean(row.get("Recommendation"))
     go_live     = clean(row.get("Target Go-Live Date"))
@@ -395,10 +396,10 @@ def uc_card(row, border_color=None):
     score_line  = (f"<br><span style='font-size:0.78rem;'><b>Score:</b> {score} &nbsp;|&nbsp; "
                    f"<b>Band:</b> {band}</span>") if pd.notna(band) and pd.notna(score) else ""
     go_live_line = f"<br><b>Target Go-Live:</b> {go_live}" if go_live != "Not provided" else ""
+    maker_line   = f"<b>Maker:</b> {maker}<br>" if maker != "Not provided" else ""
 
     summary_section = (f"<div style='font-size:0.82rem; color:#444; line-height:1.6;'>{summary}</div>"
                        ) if summary else ""
-    what_section = agent_section = ""
 
     return f"""
 <div style="background:#ffffff; border-radius:12px; padding:18px 16px; margin-bottom:16px;
@@ -411,7 +412,7 @@ def uc_card(row, border_color=None):
   </div>
   <div style="flex:1;">{summary_section}</div>
   <div style="border-top:1px solid #eee; padding-top:8px; font-size:0.78rem; color:{NAVY};">
-    <b>Time Savings:</b> {savings}<br>
+    {maker_line}<b>Time Savings:</b> {savings}<br>
     <b>Recommendation:</b> {rec}{go_live_line}{score_line}
   </div>
 </div>"""
