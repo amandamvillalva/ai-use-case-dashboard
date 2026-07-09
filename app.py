@@ -396,7 +396,7 @@ def uc_card(row, border_color=None):
     score_line  = (f"<br><span style='font-size:0.78rem;'><b>Score:</b> {score} &nbsp;|&nbsp; "
                    f"<b>Band:</b> {band}</span>") if pd.notna(band) and pd.notna(score) else ""
     go_live_line = f"<br><b>Target Go-Live:</b> {go_live}" if go_live != "Not provided" else ""
-    maker_line   = f"<b>Maker:</b> {maker}<br>" if maker != "Not provided" else ""
+    maker_line   = f"<b>Maker:</b> {maker}<br>"
 
     summary_section = (f"<div style='font-size:0.82rem; color:#444; line-height:1.6;'>{summary}</div>"
                        ) if summary else ""
