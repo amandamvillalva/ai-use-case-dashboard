@@ -219,15 +219,19 @@ def load_data_from_upload(uploaded_file) -> pd.DataFrame:
     df["Status"] = df["Status"].fillna("Unknown").str.strip()
     return df
 
-SUMMARIES_FILE = Path(__file__).parent / "data" / "summaries.json"
+import json
+
+SUMMARIES_FILE    = Path(__file__).parent / "data" / "summaries.json"
+RELATED_FILE      = Path(__file__).parent / "data" / "related_cases.json"
 
 def load_summaries() -> dict:
-    if SUMMARIES_FILE.exists():
-        import json
-        return json.loads(SUMMARIES_FILE.read_text())
-    return {}
+    return json.loads(SUMMARIES_FILE.read_text()) if SUMMARIES_FILE.exists() else {}
 
-SUMMARIES = load_summaries()
+def load_related() -> list:
+    return json.loads(RELATED_FILE.read_text()) if RELATED_FILE.exists() else []
+
+SUMMARIES    = load_summaries()
+RELATED_GROUPS = load_related()
 
 latest_file = find_latest_file()
 
@@ -714,3 +718,76 @@ for dept in departments:
         for i, (_, row) in enumerate(dept_df.iterrows()):
             with cols[i % 3]:
                 st.markdown(uc_card(row), unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ── Section 5: Overlapping & Related Use Cases ────────────────────────────────
+st.markdown(
+    f'<div style="background-color:#6554C0; border-radius:10px; padding:16px 24px; '
+    f'margin:8px 0 4px 0; box-shadow:0 3px 10px rgba(0,0,0,0.15);">'
+    f'<span style="color:#ffffff; font-size:1.2rem; font-weight:800; letter-spacing:0.5px;" class="section-title">'
+    f'🔗 Overlapping &amp; Related Use Cases</span></div>',
+    unsafe_allow_html=True,
+)
+st.markdown(
+    "<p style='font-size:0.88rem; color:#444; margin: 8px 0 16px 0;'>"
+    "Cases that touch similar processes, share data sources, or risk duplication. "
+    "Flagged to help the committee coordinate and avoid redundant builds.</p>",
+    unsafe_allow_html=True,
+)
+
+RISK_CONFIG = {
+    "high":   {"color": "#BF2600", "label": "High overlap risk",   "icon": "🔴"},
+    "medium": {"color": "#F26B43", "label": "Medium overlap risk",  "icon": "🟠"},
+    "low":    {"color": "#005EFF", "label": "Related / connected",  "icon": "🔵"},
+}
+
+all_case_names = set(filtered_df["Use Case Name"].dropna().tolist())
+
+if not RELATED_GROUPS:
+    st.info("No overlap data available.")
+else:
+    for group in RELATED_GROUPS:
+        # Only show groups where at least 2 cases are in the current filtered view
+        visible = [n for n in group["group"] if n in all_case_names]
+        if len(visible) < 2:
+            continue
+
+        risk    = group.get("risk", "low")
+        cfg     = RISK_CONFIG[risk]
+        reason  = group["reason"]
+        names   = group["group"]
+
+        header_html = (
+            f'<div style="border-left:4px solid {cfg["color"]}; padding:12px 16px; '
+            f'background:#ffffff; border-radius:0 10px 10px 0; margin-bottom:4px; '
+            f'box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
+            f'<div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">'
+            f'<span style="font-size:0.72rem; font-weight:700; background:{cfg["color"]}; '
+            f'color:#fff; padding:2px 10px; border-radius:12px;">{cfg["icon"]} {cfg["label"]}</span>'
+            f'</div>'
+            f'<div style="font-size:0.82rem; color:#444; line-height:1.6; margin-bottom:10px;">{reason}</div>'
+            f'<div style="display:flex; flex-wrap:wrap; gap:6px;">'
+        )
+        for n in names:
+            exists = n in all_case_names
+            chip_style = (
+                f'background:{cfg["color"]}; color:#fff;'
+                if exists else
+                'background:#e0e0e0; color:#888; text-decoration:line-through;'
+            )
+            header_html += (
+                f'<span style="font-size:0.75rem; font-weight:600; padding:3px 12px; '
+                f'border-radius:20px; {chip_style}">{n}</span>'
+            )
+        header_html += '</div></div>'
+
+        with st.expander(f"{cfg['icon']}  {' · '.join(names[:2])}{'  + more' if len(names) > 2 else ''}", expanded=False):
+            st.markdown(header_html, unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
+            # Show cards for visible cases
+            rows_to_show = filtered_df[filtered_df["Use Case Name"].isin(visible)].reset_index(drop=True)
+            cols = st.columns(min(len(rows_to_show), 3))
+            for i, (_, row) in enumerate(rows_to_show.iterrows()):
+                with cols[i % 3]:
+                    st.markdown(uc_card(row, border_color=cfg["color"]), unsafe_allow_html=True)

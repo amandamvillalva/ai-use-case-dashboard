@@ -1,0 +1,72 @@
+[
+  {
+    "group": ["Action Planner", "My Actions Tracker or Project RAID Log"],
+    "reason": "Nearly identical in scope — both aggregate action items from meetings and emails, assign owners and due dates, and track completion status. High duplication risk.",
+    "risk": "high"
+  },
+  {
+    "group": ["Offer Letter Generation Automation", "Letter generation"],
+    "reason": "Both generate employment letters from data inputs. Offer Letter covers the full offer workflow; Letter Generation includes offer letters alongside VOE, tax, and termination letters. Could share a common document generation engine.",
+    "risk": "high"
+  },
+  {
+    "group": ["ER Process Agent for People Team", "Employee Relations Administration (ERA) Automation", "ER Notification Script Automation"],
+    "reason": "All three operate within the ER and involuntary exit workflow. ER Process Agent provides guidance and templates; ERA Automation handles data validation and document generation for US exits; ER Notification automates the notification scripts. These could function as sequential stages of one end-to-end ER workflow.",
+    "risk": "high"
+  },
+  {
+    "group": ["India Benefits Agent", "Australia Benefit"],
+    "reason": "Same agent type — regional benefits Q&A — built independently for different geographies. Could share a single architecture with region-specific knowledge bases.",
+    "risk": "medium"
+  },
+  {
+    "group": ["Decision Grade Job Architecture Database", "Job Code Advisor", "Job Description Validator and Database", "Compensation Recommendation Agent"],
+    "reason": "These four cases are interdependent. Job Architecture is the foundational data source that Job Code Advisor, JD Validator, and Comp Recommendation all depend on. Building the others before the database is in place creates a shared dependency risk.",
+    "risk": "medium"
+  },
+  {
+    "group": ["Performance Pulse Insights Agent", "Manager 180 Development Agent", "MREQ Self Assessment", "Helping employees and managers quickly draft clear, outcome-focused objectives (KPIs) , aligned to business priorities and refreshed quarterly to stay relevant and focused on Corporate Scorecard"],
+    "reason": "All four are part of the performance and development ecosystem. They touch overlapping data (manager scores, performance discussions, development plans) and target the same users — managers and PBPs. Coordination could prevent redundant data pulls and inconsistent outputs.",
+    "risk": "medium"
+  },
+  {
+    "group": ["PBP Finder", "PBP Risks & Opportunities"],
+    "reason": "Both are PBP-focused tools. PBP Finder identifies who the PBP is; PBP Risks surfaces signals for that PBP to act on. These could naturally work together as a connected experience.",
+    "risk": "low"
+  },
+  {
+    "group": ["Offer Letter Generation Automation", "Requisition Assignment Agent", "DPS MU NHO Agent", "EMEA Onboarding Assistant", "FICA Status Review Agent"],
+    "reason": "All five support the new hire onboarding pipeline at different stages — from requisition assignment, to offer generation, to FICA review, to orientation setup, to onboarding Q&A. Coordination would ensure a seamless handoff across these steps.",
+    "risk": "low"
+  },
+  {
+    "group": ["Power BI Dashboard Assistant", "SOP PBI Builder", "Story Report Assistant", "WW Report advisor"],
+    "reason": "All four support analytics and reporting within the same toolset (WorkWise, Power BI, SAP). Users asking questions across these tools may overlap, and a unified reporting assistant could cover all four.",
+    "risk": "low"
+  },
+  {
+    "group": ["Leave of Absence", "Sickness and absence mgmt"],
+    "reason": "Both manage employee absence. Sickness monitoring and LOA management are closely linked — extended sick leave often triggers a formal LOA process. These may benefit from a shared data model.",
+    "risk": "medium"
+  },
+  {
+    "group": ["In Good Standing Agent", "Employee Relations Administration (ERA) Automation"],
+    "reason": "In Good Standing checks ER case history in SNOW as part of its determination; ERA Automation reads the same ER case data for exit processing. Both query overlapping data sources.",
+    "risk": "low"
+  },
+  {
+    "group": ["Hiring Manager Assist", "Job Description Validator and Database", "In Good Standing Agent"],
+    "reason": "All three support the talent acquisition process. Hiring Manager Assist guides the hiring process; JD Validator ensures job descriptions are accurate before posting; In Good Standing is checked before internal moves or promotions.",
+    "risk": "low"
+  },
+  {
+    "group": ["Agentic Career Center", "Manager 180 Development Agent", "MREQ Self Assessment"],
+    "reason": "All three support employee and manager development. The Career Center's Development Planning Agent and the Manager 180 Development Agent both produce development plans — outputs could conflict or duplicate if not coordinated.",
+    "risk": "medium"
+  },
+  {
+    "group": ["US Regional Business Partner", "Compensation Recommendation Agent"],
+    "reason": "US RBP monitors regulatory and legislative changes that directly affect compensation decisions. The Comp Recommendation Agent applies those guidelines. These should share a connected knowledge base to stay in sync.",
+    "risk": "low"
+  }
+]
